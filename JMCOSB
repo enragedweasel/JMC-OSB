@@ -1,0 +1,63 @@
+Imports MySql.Data.MySqlClient
+Public Class Form1
+
+    Dim Uname As String
+    ReadOnly connection As New MySqlConnection("datasource=192.168.1.134;port=3306;username='root';password='Khajiit19!';database = Barcodes")
+
+    Private Sub Label1_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBoxPassword.TextChanged, TextBoxUsername.TextChanged
+
+    End Sub
+
+    Private Sub CheckBoxSP_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxSP.CheckedChanged
+
+        If TextBoxPassword.UseSystemPasswordChar = True Then
+
+            TextBoxPassword.UseSystemPasswordChar = False
+
+        Else
+
+            TextBoxPassword.UseSystemPasswordChar = True
+
+        End If
+
+
+    End Sub
+
+    Private Sub ButtonCancel_Click(sender As Object, e As EventArgs) Handles ButtonCancel.Click
+
+        Me.Close()
+
+    End Sub
+
+    Private Sub ButtonLogin_Click(sender As Object, e As EventArgs) Handles ButtonLogin.Click
+
+        Dim command As New MySqlCommand("SELECT `username`, 'password' FROM `Accounts` WHERE `username` = @username AND `password` = @password;", connection)
+
+        command.Parameters.Add("@username", MySqlDbType.VarChar).Value = TextBoxUsername.Text
+        command.Parameters.Add("@password", MySqlDbType.VarChar).Value = TextBoxPassword.Text
+
+        Dim adapter As New MySqlDataAdapter(command)
+        Dim table As New DataTable()
+
+        Try
+            adapter.Fill(table)
+        Catch ex As Exception
+            MessageBox.Show("Could Not Connect To MySQL Server")
+        End Try
+
+        If table.Rows.Count = 0 Then
+            MessageBox.Show("Invalid username or password")
+        ElseIf MessageBox.Show("Login Succesful") Then
+            Dim Barcode = New Barcode()
+            Me.Hide()
+            Barcode.ShowDialog()
+            Me.Close()
+        End If
+
+
+    End Sub
+End Class
